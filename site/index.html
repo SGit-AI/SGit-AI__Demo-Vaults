@@ -25,8 +25,8 @@
 </head>
 <body>
   <div class="bar">
-    <span><b>demos.sgit.ai</b> — this page holds no content: it fetches ciphertext from its own
-    static file tree and decrypts it in your browser with the published read key
+    <span><b>demos.sgit.ai</b> — this page holds no content: it fetches ciphertext from
+    <code>send.sgraph.ai</code> and decrypts it in your browser with the published read key
     (<code>vault 2a8d3n2z</code>).</span>
     <a href="https://sgit.ai" rel="noopener">sgit.ai</a>
   </div>
@@ -36,11 +36,18 @@
   published in this page's source.</noscript>
   <script src="vault-embed.js"></script>
   <script>
-    // The published triple. The endpoint is this site itself: GitHub Pages serves the
-    // vault's encrypted bare/ tree at the same paths the live API would use, so the
-    // embed host works unchanged (see /vault/static-hosting.md on sgit.ai).
+    // The published triple. Ciphertext is fetched from the SG/API host over CORS and
+    // decrypted here in the browser — this page holds no vault content of its own.
+    //
+    // NOT location.origin: this site is served from a repo subpath
+    // (sgit-ai.github.io/SGit-AI__Demo-Vaults/), and the embed host builds read URLs
+    // as <endpoint>/api/vault/read/... — from the bare origin those resolve above the
+    // site root and 404. CI also mirrors the encrypted tree into this site (see
+    // /api/vault/read/<vault-id>/), which is the static-hosting demonstration and an
+    // offline/air-gap copy; to open the vault from that mirror instead, the endpoint
+    // must include the subpath: location.origin + location.pathname.replace(/\/$/,'').
     SGVaultEmbed.mount(document.getElementById('embed'), {
-      endpoint: location.origin,
+      endpoint: 'https://send.sgraph.ai',
       vault_id: '2a8d3n2z',
       read_key: 'e6136dab44fecf12b440d6f827419fcb5d51e244576116336c5bef0c42adaa1a',
       entry: 'index.html',

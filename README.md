@@ -100,13 +100,19 @@ deploys automatically.
 
 ## Where the catalogue vault is served
 
-The vault is published on the SG/Send server and mirrored statically by CI, so the
-same read key opens it from either endpoint:
+The vault is published on the SG/API host and *also* mirrored statically by CI, so the
+same read key opens it from either place:
 
 | Endpoint | How | Status |
 |---|---|---|
-| `https://dev.send.sgraph.ai` | live API, `sgit push`ed 2026-08-16 | **live** — ref, objects and index serve with `access-control-allow-origin: *` |
-| `https://demos.sgit.ai` | static path-mirror built by CI | pending the Pages enablement above |
+| `https://send.sgraph.ai` | the SG/API host, `sgit push`ed 2026-08-16 | **live** — what the demos site fetches from |
+| `https://demos.sgit.ai/api/vault/read/<vault-id>/` | static path-mirror built by CI | the static-hosting demonstration and offline/air-gap copy |
+
+**The site page reads from the API host, not from its own mirror.** Two reasons: the
+API is the canonical, always-current copy; and this site is served from a repo subpath
+(`sgit-ai.github.io/SGit-AI__Demo-Vaults/`), so an endpoint of `location.origin` builds
+read URLs above the site root and 404s. To open the vault from the mirror instead, the
+endpoint must carry the subpath — see the comment in `site/index.html`.
 
 ## Provenance
 
