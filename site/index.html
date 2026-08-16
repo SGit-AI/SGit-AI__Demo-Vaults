@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Vaults — sgit.ai</title>
+<meta name="description" content="Read-only sgit demo vaults: the catalogue itself is a vault app, decrypted in your browser with a published read key, served from this static host.">
+<style>
+  :root{ --paper:#0e1116; --panel:#161b23; --line:#242c38; --ink:#dce3ec; --dim:#8b96a5; --gold:#d8b26a; }
+  *{ box-sizing:border-box }
+  html,body{ height:100% }
+  body{ margin:0; background:var(--paper); color:var(--ink); display:flex; flex-direction:column;
+        font-family:ui-sans-serif, system-ui, sans-serif }
+  .bar{ display:flex; align-items:center; gap:.8rem; padding:.65rem 1rem; border-bottom:1px solid var(--line);
+        font-size:.8rem; color:var(--dim); flex-wrap:wrap }
+  .bar b{ color:var(--gold); font-weight:600 }
+  .bar code{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.7rem; color:var(--ink);
+             overflow-wrap:anywhere }
+  .bar a{ color:var(--gold); text-decoration:none; margin-left:auto }
+  #embed{ flex:1; display:flex; min-height:0 }
+  .sgv-embed-frame{ flex:1; width:100%; border:0 }
+  .sgv-embed-loading{ padding:2rem; color:var(--dim); font-size:.9rem }
+  noscript{ display:block; padding:2rem; color:var(--ink) }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span><b>demos.sgit.ai</b> — this page holds no content: it fetches ciphertext from its own
+    static file tree and decrypts it in your browser with the published read key
+    (<code>vault 2a8d3n2z</code>).</span>
+    <a href="https://sgit.ai" rel="noopener">sgit.ai</a>
+  </div>
+  <div id="embed"></div>
+  <noscript>This page decrypts an encrypted vault in your browser and needs JavaScript.
+  The raw encrypted objects are under /api/vault/read/2a8d3n2z/ — the read key is
+  published in this page's source.</noscript>
+  <script src="vault-embed.js"></script>
+  <script>
+    // The published triple. The endpoint is this site itself: GitHub Pages serves the
+    // vault's encrypted bare/ tree at the same paths the live API would use, so the
+    // embed host works unchanged (see /vault/static-hosting.md on sgit.ai).
+    SGVaultEmbed.mount(document.getElementById('embed'), {
+      endpoint: location.origin,
+      vault_id: '2a8d3n2z',
+      read_key: 'e6136dab44fecf12b440d6f827419fcb5d51e244576116336c5bef0c42adaa1a',
+      entry: 'index.html',
+      title: 'Demo Vaults catalogue'
+    });
+  </script>
+</body>
+</html>
