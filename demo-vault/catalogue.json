@@ -12,7 +12,7 @@
       "copy_or_reference": "reference",
       "write_key_status": "escrowed",
       "vault_id": "2a8d3n2z",
-      "endpoint": "https://demos.sgit.ai",
+      "endpoint": "https://dev.send.sgraph.ai",
       "read_key": "e6136dab44fecf12b440d6f827419fcb5d51e244576116336c5bef0c42adaa1a",
       "zip": null,
       "zip_sha256": null,

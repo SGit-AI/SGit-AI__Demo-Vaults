@@ -96,9 +96,17 @@ The pipeline is green except the final step: **GITHUB_TOKEN cannot create a Page
 site**, so an admin must do this once — Settings → Pages → Build and deployment →
 Source: **GitHub Actions**. Then set custom domain `demos.sgit.ai` (and add the DNS
 CNAME record `demos` → `sgit-ai.github.io`). Every subsequent push to `dev`
-deploys automatically. Also pending: `sgit push` of `demo-vault/` to a SG/Send
-server with the owner's token — until then the site serves the vault purely
-statically (see the local-publish shim note in `ci-pipeline.yml`).
+deploys automatically.
+
+## Where the catalogue vault is served
+
+The vault is published on the SG/Send server and mirrored statically by CI, so the
+same read key opens it from either endpoint:
+
+| Endpoint | How | Status |
+|---|---|---|
+| `https://dev.send.sgraph.ai` | live API, `sgit push`ed 2026-08-16 | **live** — ref, objects and index serve with `access-control-allow-origin: *` |
+| `https://demos.sgit.ai` | static path-mirror built by CI | pending the Pages enablement above |
 
 ## Provenance
 
