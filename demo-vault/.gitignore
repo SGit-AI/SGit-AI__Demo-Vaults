@@ -1,0 +1,6 @@
+# sgit local credential tier — plaintext vault key, push token, unwrapped private keys.
+# NEVER commit. The rest of .sg_vault/ (bare/) is the encrypted server-parity store and is safe.
+.sg_vault/local/
+.sg_vault/work/
+.sg_vault/backups/
+*.pem

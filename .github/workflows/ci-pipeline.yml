@@ -1,0 +1,179 @@
+name: CI Pipeline
+
+# Order of operations on push to dev/main (modelled on VoiceDebrief__Website's
+# pipeline, trimmed to this repo's current scope — the QA layer comes later):
+#   1. validate       — secret audit of every published vault archive + catalogue
+#                       sanity. A failure stops the release: no tag, no publish.
+#   2. increment-tag  — bumps the repo `version` file and pushes the tag
+#                       (dev = minor, main = major). CI owns the version file.
+#   3. build-pages    — pulls the freshly bumped commit and assembles the
+#                       demos.sgit.ai artifact:
+#                         · site/            → the host page (boots the catalogue
+#                                              vault app with its published read key)
+#                         · demo-vault bare/ → path-mirrored at
+#                                              api/vault/read/<vault-id>/bare/ so this
+#                                              static host serves the vault itself
+#                         · every vaults/*/vault.zip → its bare/ tree path-mirrored
+#                                              too, so demos.sgit.ai is an endpoint
+#                                              for every catalogued vault
+#                         · plaintext zips   → /vaults/<slug>/vault.zip for download
+#   4. deploy-pages   — GitHub Pages deployment (custom domain: demos.sgit.ai).
+#
+# The bump commit is pushed with GITHUB_TOKEN, which does not re-trigger this
+# workflow, so there is no tag->publish loop.
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: "ci-pipeline-${{ github.ref_name }}"
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate (secret audit + catalogue)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Secret audit — every published archive must be clean
+        run: |
+          set -e
+          found=0
+          for z in demo-vault/vaults/*/vault.zip; do
+            [ -f "$z" ] || continue
+            found=1
+            echo "== $z"
+            bash scripts/audit_vault_export.sh "$z"
+          done
+          [ "$found" = "1" ] || echo "no archives yet — nothing to audit"
+
+      - name: No credential tier in the tracked tree
+        # The vault's local/ tier is gitignored; fail hard if it ever gets forced in.
+        run: |
+          set -e
+          if git ls-files | grep -E '\.sg_vault/(local|work)/'; then
+            echo "credential/scratch tier tracked in git — refusing to publish"; exit 1
+          fi
+          if git ls-files | grep -E '(^|/)(vault_key|VAULT-KEY|token)$|\.pem$'; then
+            echo "key material tracked in git — refusing to publish"; exit 1
+          fi
+          echo "tracked tree clean"
+
+      - name: Catalogue sanity
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib, sys
+          cat = json.load(open('demo-vault/catalogue.json'))
+          fails = []
+          for e in cat['entries']:
+              for f in ('slug','one_line','shape','evidence_status','copy_or_reference',
+                        'write_key_status','vault_id','endpoint','read_key'):
+                  if not e.get(f): fails.append(f"{e.get('slug','?')}: missing {f}")
+              if e.get('zip'):
+                  p = pathlib.Path('demo-vault')/e['zip']
+                  if not p.is_file(): fails.append(f"{e['slug']}: zip not found: {e['zip']}")
+          for line in fails: print('FAIL:', line)
+          sys.exit(1 if fails else 0)
+          EOF
+
+  increment-tag:
+    name: Increment Tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [validate]
+    permissions:
+      contents: write
+    if: github.event_name == 'push' && (github.ref_name == 'dev' || github.ref_name == 'main')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Increment Tag
+        uses: owasp-sbot/OSBot-GitHub-Actions/.github/actions/git__increment-tag@dev
+        with:
+          release_type: ${{ github.ref_name == 'main' && 'major' || 'minor' }}
+
+  build-pages:
+    name: Build demos.sgit.ai (versioned)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [validate, increment-tag]
+    # Publish from dev (the Pages estate). Runs even when increment-tag is
+    # skipped (manual dispatch) — but never when validation failed.
+    if: always() && needs.validate.result == 'success' && (needs.increment-tag.result == 'success' || needs.increment-tag.result == 'skipped') && (github.ref_name == 'dev')
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Pull the version bump commit
+        run: git pull origin ${{ github.ref_name }}
+
+      - name: Assemble site artifact
+        run: |
+          set -e
+          SITE=/tmp/site
+          mkdir -p "$SITE"
+          cp -r site/. "$SITE/"
+          cp version "$SITE/version.txt"
+
+          # The catalogue vault itself: path-mirror its encrypted bare/ tree so this
+          # host serves it at the same GET paths the live API would use.
+          SELF_VID=$(python3 -c "import json; c=json.load(open('demo-vault/catalogue.json')); print([e for e in c['entries'] if e['slug']=='demo-vaults-catalogue'][0]['vault_id'])")
+          mkdir -p "$SITE/api/vault/read/$SELF_VID"
+          cp -r demo-vault/.sg_vault/bare "$SITE/api/vault/read/$SELF_VID/"
+          echo "mirrored catalogue vault: $SELF_VID"
+
+          # Every published archive: plaintext zip for download + its bare/ tree
+          # mirrored, so demos.sgit.ai is a read endpoint for every catalogued vault.
+          for m in demo-vault/vaults/*/manifest.json; do
+            [ -f "$m" ] || continue
+            slug=$(python3 -c "import json;print(json.load(open('$m'))['slug'])")
+            vid=$(python3 -c "import json;print(json.load(open('$m'))['vault_id'])")
+            sha=$(python3 -c "import json;print(json.load(open('$m'))['archive_sha256'])")
+            z="demo-vault/vaults/$slug/vault.zip"
+            echo "$sha  $z" | sha256sum -c -
+            mkdir -p "$SITE/vaults/$slug"
+            cp "$z" "$SITE/vaults/$slug/vault.zip"
+            cp "$m" "$SITE/vaults/$slug/manifest.json"
+            t=$(mktemp -d)
+            unzip -q "$z" -d "$t"
+            mkdir -p "$SITE/api/vault/read/$vid"
+            cp -r "$t/bare" "$SITE/api/vault/read/$vid/"
+            rm -rf "$t"
+            echo "mirrored $slug: $vid"
+          done
+
+          find "$SITE" -maxdepth 4 -type d | sort
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: /tmp/site
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build-pages]
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,2 @@
+# encrypted CAS objects, indexes and wrapped keys — treat as opaque binary
+.sg_vault/bare/** binary -diff -merge

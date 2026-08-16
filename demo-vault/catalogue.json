@@ -1,0 +1,41 @@
+{
+  "title": "Demo Vaults",
+  "tagline": "Read-only demo vaults, published as encrypted archives. Every entry lists its read key — that is the point: read access is a capability you can hand out. Write keys are never published, anywhere.",
+  "site": "https://demos.sgit.ai",
+  "entries": [
+    {
+      "slug": "demo-vaults-catalogue",
+      "title": "Demo Vaults (this catalogue)",
+      "one_line": "The vault you are reading right now: the catalogue app, its data, and every published demo vault archive — a vault listing vaults, including itself.",
+      "shape": "application",
+      "evidence_status": "production",
+      "copy_or_reference": "reference",
+      "write_key_status": "escrowed",
+      "vault_id": "2a8d3n2z",
+      "endpoint": "https://demos.sgit.ai",
+      "read_key": "e6136dab44fecf12b440d6f827419fcb5d51e244576116336c5bef0c42adaa1a",
+      "zip": null,
+      "zip_sha256": null,
+      "exported_at": "2026-08-16",
+      "last_verified": "2026-08-16",
+      "superseded_by": null
+    },
+    {
+      "slug": "field-notes-embed-demo",
+      "title": "Field Notes",
+      "one_line": "The vault-app-embed demo from sgit.ai: six small studies, each a note and a drawing, served as a vault app with a deliberately published read key.",
+      "shape": "application",
+      "evidence_status": "demonstration",
+      "copy_or_reference": "copy",
+      "write_key_status": "escrowed",
+      "vault_id": "4bshby5n",
+      "endpoint": "https://dev.send.sgraph.ai",
+      "read_key": "2848993a68c02a33ea5582902c391901191e53680d35b36c0e76185d4107ad81",
+      "zip": "vaults/field-notes-embed-demo/vault.zip",
+      "zip_sha256": "f6373c2c114e26decbeab4c136847acb3d4341960905ff1874934a4d6f0632d2",
+      "exported_at": "2026-08-16",
+      "last_verified": "2026-08-16",
+      "superseded_by": null
+    }
+  ]
+}
