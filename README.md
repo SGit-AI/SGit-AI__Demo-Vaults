@@ -90,6 +90,16 @@ git clone https://github.com/SGit-AI/SGit-AI__Demo-Vaults
 # or deploy the whole estate to your own server: see docs/DEPLOYMENT.md
 ```
 
+## One-time setup still needed (repo admin)
+
+The pipeline is green except the final step: **GITHUB_TOKEN cannot create a Pages
+site**, so an admin must do this once — Settings → Pages → Build and deployment →
+Source: **GitHub Actions**. Then set custom domain `demos.sgit.ai` (and add the DNS
+CNAME record `demos` → `sgit-ai.github.io`). Every subsequent push to `dev`
+deploys automatically. Also pending: `sgit push` of `demo-vault/` to a SG/Send
+server with the owner's token — until then the site serves the vault purely
+statically (see the local-publish shim note in `ci-pipeline.yml`).
+
 ## Provenance
 
 The design comes from the 14 August 2026 brief set in the SGraph Send corpus
