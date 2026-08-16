@@ -41,6 +41,20 @@
   .row a{ color:var(--gold); text-decoration:none; border-bottom:1px solid
           color-mix(in srgb, var(--gold) 40%, transparent) }
   .row a:hover{ border-bottom-color:var(--gold) }
+  .acts{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.85rem }
+  .acts button, .acts a.btn{ font:inherit; font-size:.79rem; cursor:pointer;
+        background:var(--paper); color:var(--ink); border:1px solid var(--line);
+        border-radius:8px; padding:.42rem .8rem; text-decoration:none; display:inline-block }
+  .acts button:hover, .acts a.btn:hover{ border-color:var(--teal); color:var(--teal) }
+  .acts button.primary{ border-color:color-mix(in srgb, var(--gold) 55%, transparent);
+        color:var(--gold) }
+  .acts button.primary:hover{ border-color:var(--gold) }
+  .acts button[disabled]{ opacity:.55; cursor:default; border-color:var(--line); color:var(--dim) }
+  .clone{ margin-top:.6rem; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.68rem;
+          color:var(--dim); background:var(--paper); border:1px solid var(--line);
+          border-radius:8px; padding:.5rem .7rem; overflow-x:auto; white-space:pre }
+  .clone b{ color:var(--ink); font-weight:500 }
+  .status{ margin-top:.5rem; font-size:.75rem; color:var(--dim); min-height:1em }
   .sha{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.64rem; color:var(--dim);
         margin-top:.55rem; overflow-wrap:anywhere }
   .frozen-note{ color:var(--warn); font-size:.78rem; margin-top:.55rem }
@@ -92,9 +106,40 @@
   document.getElementById('hSrc').innerHTML = 'catalogue: <b>' + srcLabel + '</b>';
 
   var site = (cat.site || '').replace(/\/$/, '');
+  var vaultUi = (cat.vault_ui || 'https://dev.vault.sgraph.ai').replace(/\/$/, '');
   var grid = document.getElementById('grid');
 
   function esc(s){ var d=document.createElement('div'); d.textContent=String(s==null?'':s); return d.innerHTML; }
+
+  // The canonical prefixed read-key credential the CLI emits and the vault UI accepts.
+  // Deliberately publishable: read-only by construction, cannot become write access.
+  function cred(e){ return 'sgit_rk1_' + e.read_key + ':' + e.vault_id; }
+
+  // Opening a vault in-page: ask the HOST page (which owns the embed library and a
+  // non-sandboxed origin) to mount it. When this app runs somewhere that does not
+  // answer — SG/App, the vault browser, a raw file — nothing acks and we fall back to
+  // opening the official read-only UI in a new tab, which works everywhere.
+  var ackSeen = false;
+  window.addEventListener('message', function (ev) {
+    var m = ev.data;
+    if (m && m.sgvCat === 1 && m.openAck) ackSeen = true;
+  });
+  function openHere(e, statusEl, btn) {
+    ackSeen = false;
+    statusEl.textContent = 'opening ' + e.vault_id + ' in this page…';
+    try {
+      parent.postMessage({ sgvCat: 1, open: {
+        endpoint: e.endpoint, vault_id: e.vault_id, read_key: e.read_key, title: e.title
+      }}, '*');
+    } catch (err) {}
+    setTimeout(function () {
+      if (ackSeen) { statusEl.textContent = ''; return; }
+      statusEl.textContent = 'this host cannot embed — opening the official read-only UI in a new tab…';
+      var w = window.open(vaultUi + '/#' + encodeURIComponent(cred(e)), '_blank', 'noopener');
+      if (!w) statusEl.textContent = 'popup blocked — use the "open read-only ↗" link instead.';
+      if (btn) btn.disabled = false;
+    }, 1200);
+  }
 
   (cat.entries || []).forEach(function (e, i) {
     var card = document.createElement('section');
@@ -108,9 +153,14 @@
              : '<span class="b">write key ' + esc(e.write_key_status) + '</span>'
     ];
     if (e.superseded_by) badges.push('<span class="b frozen">superseded by ' + esc(e.superseded_by) + '</span>');
-    var links = [];
-    if (e.zip) links.push('<a href="' + esc(site + '/' + e.zip) + '" target="_blank" rel="noopener" download>download vault.zip</a>');
-    if (e.endpoint && e.vault_id) links.push('<span>served at ' + esc(e.endpoint) + '</span>');
+    var acts = [
+      '<button class="primary" data-act="open">▶ Open the vault</button>',
+      '<a class="btn" href="' + esc(vaultUi + '/#' + encodeURIComponent(cred(e))) +
+        '" target="_blank" rel="noopener">open read-only in SG/App ↗</a>'
+    ];
+    if (e.zip && site) acts.push('<a class="btn" href="' + esc(site + '/' + e.zip) +
+        '" target="_blank" rel="noopener" download>⭳ download vault.zip</a>');
+
     card.innerHTML =
       '<h2>' + esc(e.title) + '</h2>' +
       '<p class="one">' + esc(e.one_line) + '</p>' +
@@ -120,9 +170,19 @@
         'endpoint : <b>' + esc(e.endpoint) + '</b>\n' +
         'read key : <b>' + esc(e.read_key) + '</b>' +
       '</div>' +
-      '<div class="row">' + links.join(' · ') + '</div>' +
+      '<div class="acts">' + acts.join('') + '</div>' +
+      '<div class="status"></div>' +
+      '<div class="clone">clone it: <b>sgit clone ' + esc(cred(e)) + '</b></div>' +
       (e.zip_sha256 ? '<div class="sha">sha256 ' + esc(e.zip_sha256) + '</div>' : '') +
       (frozen ? '<div class="frozen-note">This vault can never be updated or corrected — its write key is lost. What you read is what it will always say.</div>' : '');
+
+    var openBtn = card.querySelector('[data-act="open"]');
+    var statusEl = card.querySelector('.status');
+    openBtn.addEventListener('click', function () {
+      openBtn.disabled = true;
+      openHere(e, statusEl, openBtn);
+    });
+
     grid.appendChild(card);
     setTimeout(function(){ card.classList.add('in'); }, 60 * i);
   });

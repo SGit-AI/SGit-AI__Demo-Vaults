@@ -1,7 +1,9 @@
 {
   "title": "Demo Vaults",
   "tagline": "Read-only demo vaults, published as encrypted archives. Every entry lists its read key — that is the point: read access is a capability you can hand out. Write keys are never published, anywhere.",
-  "site": "https://demos.sgit.ai",
+  "site": "https://sgit-ai.github.io/SGit-AI__Demo-Vaults",
+  "site_note": "Base for archive downloads. Switch to https://demos.sgit.ai once that DNS resolves (CNAME demos -> sgit-ai.github.io); until then that host is NXDOMAIN and every download link 404s.",
+  "vault_ui": "https://dev.vault.sgraph.ai",
   "entries": [
     {
       "slug": "demo-vaults-catalogue",

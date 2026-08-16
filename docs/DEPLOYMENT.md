@@ -89,3 +89,16 @@ archives carry their own integrity hashes.
 - **Withdraw a published key.** Removing objects from servers you control does not
   revoke the copies others hold. Publication is permanent; see the frozen-vault rule
   in `docs/PUBLISHING.md`.
+
+## Custom domain (demos.sgit.ai) — not yet active
+
+The site is live at `https://sgit-ai.github.io/SGit-AI__Demo-Vaults/`. `demos.sgit.ai`
+does **not** resolve yet (`DNS_PROBE_FINISHED_NXDOMAIN`), so:
+
+- there is deliberately **no `site/CNAME` file** — deploying one would tell Pages to
+  serve the custom domain and could take the working github.io URL down with it;
+- `catalogue.json` sets `site` to the github.io base, so archive download links work.
+
+To switch over, in this order: add DNS `CNAME demos → sgit-ai.github.io`, wait for it to
+resolve, then add `site/CNAME` containing `demos.sgit.ai`, set the custom domain in
+Settings → Pages, and change `site` (and `site_note`) in `demo-vault/catalogue.json`.

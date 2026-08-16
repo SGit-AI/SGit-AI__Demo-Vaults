@@ -21,6 +21,19 @@
   .sgv-embed-frame{ flex:1; width:100%; border:0 }
   .sgv-embed-loading{ padding:2rem; color:var(--dim); font-size:.9rem }
   noscript{ display:block; padding:2rem; color:var(--ink) }
+  /* Overlay for opening a catalogued vault in this page */
+  #overlay{ position:fixed; inset:0; background:rgba(6,8,11,.86); display:none;
+            flex-direction:column; z-index:50 }
+  #overlay.on{ display:flex }
+  #ovbar{ display:flex; align-items:center; gap:.8rem; padding:.6rem 1rem;
+          border-bottom:1px solid var(--line); font-size:.8rem; color:var(--dim);
+          background:var(--paper) }
+  #ovbar b{ color:var(--gold) }
+  #ovclose{ margin-left:auto; font:inherit; font-size:.78rem; cursor:pointer;
+            background:transparent; color:var(--ink); border:1px solid var(--line);
+            border-radius:8px; padding:.35rem .75rem }
+  #ovclose:hover{ border-color:var(--gold); color:var(--gold) }
+  #ovbody{ flex:1; display:flex; min-height:0; background:var(--paper) }
 </style>
 </head>
 <body>
@@ -31,6 +44,14 @@
     <a href="https://sgit.ai" rel="noopener">sgit.ai</a>
   </div>
   <div id="embed"></div>
+  <div id="overlay">
+    <div id="ovbar">
+      <span>opening vault <b id="ovid"></b> — ciphertext from <code id="ovep"></code>,
+      decrypted in this browser with its published read key</span>
+      <button id="ovclose" type="button">✕ close</button>
+    </div>
+    <div id="ovbody"></div>
+  </div>
   <noscript>This page decrypts an encrypted vault in your browser and needs JavaScript.
   The raw encrypted objects are under /api/vault/read/2a8d3n2z/ — the read key is
   published in this page's source.</noscript>
@@ -53,6 +74,39 @@
       entry: 'index.html',
       title: 'Demo Vaults catalogue'
     });
+
+    // Open-a-catalogued-vault-in-this-page. The catalogue app runs in a sandboxed,
+    // opaque-origin frame and cannot mount an embed itself, so it asks this page to do
+    // it and we ack. No ack (SG/App, the vault browser, a raw file) means the app falls
+    // back to opening the official read-only UI in a new tab — see demo-vault/index.html.
+    (function () {
+      var ov = document.getElementById('overlay'), body = document.getElementById('ovbody');
+      var idEl = document.getElementById('ovid'), epEl = document.getElementById('ovep');
+      function close() { ov.classList.remove('on'); body.innerHTML = ''; }
+      document.getElementById('ovclose').addEventListener('click', close);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && ov.classList.contains('on')) close();
+      });
+      window.addEventListener('message', function (ev) {
+        var m = ev.data;
+        if (!m || m.sgvCat !== 1 || !m.open) return;
+        var v = m.open;
+        if (!v.vault_id || !v.read_key || !v.endpoint) return;
+        // Ack first: the app waits ~1.2s and opens a new tab if nobody answers.
+        try { ev.source.postMessage({ sgvCat: 1, openAck: 1 }, '*'); } catch (e) {}
+        idEl.textContent = v.vault_id;
+        epEl.textContent = v.endpoint;
+        body.innerHTML = '';
+        ov.classList.add('on');
+        SGVaultEmbed.mount(body, {
+          endpoint: v.endpoint, vault_id: v.vault_id,
+          read_key: v.read_key, title: v.title || ('vault ' + v.vault_id)
+        }).catch(function (err) {
+          body.innerHTML = '<div class="sgv-embed-loading">Could not open ' +
+            v.vault_id + ': ' + (err && err.message || err) + '</div>';
+        });
+      });
+    }());
   </script>
 </body>
 </html>
