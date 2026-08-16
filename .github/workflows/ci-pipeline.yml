@@ -94,6 +94,21 @@ jobs:
     if: github.event_name == 'push' && (github.ref_name == 'dev' || github.ref_name == 'main')
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Seed initial tag if the repo has none
+        # The increment-tag action derives the next version from `git describe --tags`
+        # and fails hard on a repo with no tags. First run only: seed from `version`.
+        run: |
+          git fetch --tags
+          if git describe --tags "$(git rev-list --tags --max-count=1 2>/dev/null)" 2>/dev/null; then
+            echo "tags exist — no seeding needed"
+          else
+            git tag "$(cat version)"
+            git push origin "$(cat version)"
+            echo "seeded initial tag $(cat version)"
+          fi
 
       - name: Increment Tag
         uses: owasp-sbot/OSBot-GitHub-Actions/.github/actions/git__increment-tag@dev
