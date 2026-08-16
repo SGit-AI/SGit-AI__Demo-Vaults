@@ -95,11 +95,13 @@ Run the audit script against the zip as well as the clone.
 ## Step 5 — Commit
 
 ```
-vaults/<slug>/vault.zip
-vaults/<slug>/manifest.json     (see vaults/README.md for the schema)
-vaults/<slug>/README.md
+demo-vault/vaults/<slug>/vault.zip
+demo-vault/vaults/<slug>/manifest.json     (see vaults/README.md for the schema)
 ```
 
+- Add the entry to `demo-vault/catalogue.json` (what the catalogue app renders).
+- `sgit commit` inside `demo-vault/` (the archives live in the vault too — the
+  deliberate git+sgit duplication experiment), then `git add -A && git commit`.
 - Update `catalogue/index.md` with the new row.
 - Delete `catalogue/pending/<slug>.md` in the same commit.
 - Commit message: `publish vault: <slug> (<shape>, <evidence_status>)`.

@@ -133,6 +133,17 @@ jobs:
           cp -r demo-vault/.sg_vault/bare "$SITE/api/vault/read/$SELF_VID/"
           echo "mirrored catalogue vault: $SELF_VID"
 
+          # TEMPORARY local-publish shim (verified in-browser 2026-08-16): this vault
+          # has never been `sgit push`ed (CI holds no server token, deliberately), so
+          # its published (muw) ref still points at the init commit while the content
+          # lives on the clone-branch (snw) ref. Until the vault owner pushes it to a
+          # server (which performs the real publish), point the MIRRORED copy's
+          # published ref at the clone-branch head. Both files are ciphertext refs
+          # under the same key; consumers decrypt them and read commit_id. The vault
+          # inside git is left untouched. Remove after the first real `sgit push`.
+          cp "$SITE/api/vault/read/$SELF_VID/bare/refs/ref-pid-snw-a49dbb623508" \
+             "$SITE/api/vault/read/$SELF_VID/bare/refs/ref-pid-muw-848afdd86558"
+
           # Every published archive: plaintext zip for download + its bare/ tree
           # mirrored, so demos.sgit.ai is a read endpoint for every catalogued vault.
           for m in demo-vault/vaults/*/manifest.json; do

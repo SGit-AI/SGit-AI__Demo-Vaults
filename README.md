@@ -56,19 +56,28 @@ change.
 ## Repo layout
 
 ```
+demo-vault/           ← itself an sgit vault (id 2a8d3n2z, read key published; write
+  index.html            key held out-of-band by the project lead, NEVER in this repo)
+  app.json              the Demo Vaults catalogue app (a vault app)
+  catalogue.json        the machine-readable read-key catalogue
+  vaults/<slug>/        each published demo vault: vault.zip (encrypted bare/ store)
+                        + manifest.json — stored in git AND in the vault (deliberate
+                        duplication experiment: git and sgit each version the estate)
+  .sg_vault/bare/       the vault's own encrypted store, committed (git = second
+                        untrusted server); .sg_vault/local/ is git-ignored, always
+site/                 the demos.sgit.ai host page + embed host (boots the catalogue
+                      app from this site's own static mirror of the vault)
 catalogue/
-  index.md            the read-key catalogue — one row per published vault
+  index.md            the human-readable read-key catalogue
   pending/            submission queue: one small file per vault awaiting publication
-vaults/
-  <slug>/
-    vault.zip         exported encrypted bare/ store (the vault itself)
-    manifest.json     metadata: read key, shape, evidence status, write-key status, sha256
-    README.md         human-readable entry (derived by the publishing agent)
 docs/
   PUBLISHING.md       the per-vault publishing runbook (intake → audit → export → commit)
   DEPLOYMENT.md       deploying and republishing vaults to any server
 scripts/
   audit_vault_export.sh   secret audit run on every archive before commit
+version               owned by CI: every push to dev bumps minor, main bumps major
+.github/workflows/ci-pipeline.yml   validate → increment-tag → build → deploy Pages
+                                    (demos.sgit.ai)
 ```
 
 ## Quick start (consuming)

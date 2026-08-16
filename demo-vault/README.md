@@ -22,3 +22,5 @@ Deployed to GitHub Pages at **demos.sgit.ai** by CI on every push to `dev`: the 
 serves this vault's `bare/` tree statically (path-mirrored under
 `api/vault/read/<vault-id>/`), plus the host page that boots the catalogue app from it
 with the published read key.
+
+<!-- v1 -->
