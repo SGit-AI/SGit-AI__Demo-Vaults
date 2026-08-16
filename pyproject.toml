@@ -1,0 +1,7 @@
+# Not a published package. This file exists because the CI increment-tag action
+# (owasp-sbot/OSBot-GitHub-Actions git__increment-tag) stamps the release version
+# into `version` AND `pyproject.toml`; the canonical version stamp is ./version.
+[project]
+name = "sgit-ai-demo-vaults"
+version = "v0.1.0"
+description = "Read-only demo vaults for sgit.ai, served from an encrypted vault at demos.sgit.ai"
