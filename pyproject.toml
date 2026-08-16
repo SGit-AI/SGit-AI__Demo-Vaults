@@ -3,5 +3,5 @@
 # into `version` AND `pyproject.toml`; the canonical version stamp is ./version.
 [project]
 name = "sgit-ai-demo-vaults"
-version = "v0.1.0"
+version = "v0.1.1"
 description = "Read-only demo vaults for sgit.ai, served from an encrypted vault at demos.sgit.ai"
