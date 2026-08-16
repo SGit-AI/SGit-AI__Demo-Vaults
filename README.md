@@ -1,1 +1,95 @@
-# SGit-AI__Demo-Vaults
+# SGit-AI — Demo Vaults
+
+The public, git-backed store for **read-only demo vaults**: sgit vaults published as
+archives of their encrypted `bare/` store, deployable to any server, browsable by anyone
+holding the published **read key**.
+
+This repo is the inventory answer to vault sprawl: vaults accumulate faster than they can
+be managed, and each one lives in its own environment. Here they get one canonical,
+versioned, replicable home.
+
+## The model
+
+```
+                     THIS REPO (public git)
+   vault (live) ──sgit export──▶ vaults/<slug>/vault.zip     (encrypted bare/ store)
+                                 vaults/<slug>/manifest.json (metadata + read key)
+                                 catalogue/index.md          (the read-key catalogue)
+                                        │
+                                        └──deploy──▶ any server / static host / air-gap
+                                                     (path-mirror the bare/ tree)
+                                                            │
+                                                     browser + read key
+                                                     = decrypts client-side
+```
+
+Three properties make this work:
+
+1. **The `bare/` store is designed to live in public locations.** Every object in it is
+   ciphertext protected by the key, not by where it sits. Git exposure of `bare/` is
+   equivalent to server exposure, which the zero-knowledge model already accepts. A git
+   repo is just a second untrusted server — one that gives distribution, replication and
+   history for free.
+2. **Reads need no backend.** Opening a vault is deterministic GETs against the `bare/`
+   tree (file IDs are computed client-side from the key — no listing, no manifest). Any
+   static file host that path-mirrors the tree serves the vault. Writes are simply not
+   possible without the write key, which this repo never holds.
+3. **Only the read key is needed.** These are demo vaults: read-only by design. The read
+   key is one-way derived from the vault (write) key and cannot be converted back. To
+   "edit" a published demo vault, you publish a new one and update the catalogue.
+
+This means the entire estate can be republished to a fresh server — including an
+air-gapped one — from a `git clone` of this repo alone, as often as weekly or on every
+change.
+
+## Hard rules
+
+| # | Rule |
+|---|------|
+| 1 | **Read keys yes, write keys never.** The catalogue lists read keys — a public vault's read key is published by definition. Vault (write) keys, push tokens, and the `.sg_vault/local/` tier must NEVER appear in this repo, in any file, commit message, or issue. |
+| 2 | **Escrow before publishing.** A vault whose write key is lost is *frozen*: readable forever, never updatable, never correctable, never revocable. Escrow the write key (secret manager or unpublished admin vault — never here) **before** the vault is published, and record the status (`escrowed` / `lost`) in its manifest. |
+| 3 | **Secret audit before commit.** Every archive passes `scripts/audit_vault_export.sh` and a human content review before it lands. Publishing here is permanent: a published read key cannot be withdrawn, and anyone who fetched keeps a working copy. |
+| 4 | **Evidence status stated per vault.** `production`, `demonstration`, or `sketch` — a reader who cannot tell will guess wrong. |
+| 5 | **Frozen vaults are marked publicly.** A reader deserves to know an entry will never be corrected. |
+| 6 | **Sort by shape, not domain.** Gallery, report, structured analysis, multi-agent collaboration, record-keeping, application. Healthcare is an instance of a shape, not a shape. |
+
+## Repo layout
+
+```
+catalogue/
+  index.md            the read-key catalogue — one row per published vault
+  pending/            submission queue: one small file per vault awaiting publication
+vaults/
+  <slug>/
+    vault.zip         exported encrypted bare/ store (the vault itself)
+    manifest.json     metadata: read key, shape, evidence status, write-key status, sha256
+    README.md         human-readable entry (derived by the publishing agent)
+docs/
+  PUBLISHING.md       the per-vault publishing runbook (intake → audit → export → commit)
+  DEPLOYMENT.md       deploying and republishing vaults to any server
+scripts/
+  audit_vault_export.sh   secret audit run on every archive before commit
+```
+
+## Quick start (consuming)
+
+Anyone can:
+
+```bash
+git clone https://github.com/SGit-AI/SGit-AI__Demo-Vaults
+# browse catalogue/index.md, pick a vault, open its read key at the listed host —
+# or deploy the whole estate to your own server: see docs/DEPLOYMENT.md
+```
+
+## Provenance
+
+The design comes from the 14 August 2026 brief set in the SGraph Send corpus
+(`team/humans/dinis_cruz/briefs/08/14/sgit-site-and-hub/`, v0.33.58), in particular:
+
+- *Topic sections … publish read keys, never write keys, and a vault whose write key is
+  lost is frozen rather than broken* — the catalogue schema and the escrow precondition.
+- *The serialised pull request is the headline: publish the sample vaults* — publish both
+  ways (archive + browsable embed), evidence status, shapes over domains.
+- `PUBLISHING-SGIT-VAULT-TO-GITHUB.md` and `HOSTING-ON-STATIC-STORAGE.md`
+  (`library/guides/vault-html/` in the SGraph-AI__App__Send repo) — the credential
+  boundary, the secret audit, and the static path-mirror deployment contract.
