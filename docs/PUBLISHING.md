@@ -78,16 +78,19 @@ Record the audit date, result, and reviewer in the manifest.
 ## Step 4 — Export the archive
 
 ```bash
-sgit export --output vault.zip
+sgit vault backup          # sgit-ai v0.15.0; prints the zip path and its sha256
 ```
 
-The archive must contain the encrypted `bare/` store and must NOT contain
-`.sg_vault/local/` or `.sg_vault/work/`. Verify with the audit script (it also runs
-against the zip). Compute `sha256sum vault.zip`.
+**Never use `--include-key`** — it embeds a `VAULT-KEY` file in the zip, which this
+repo must never hold.
 
-> First-onboarding note: verify the exact layout `sgit export` produces (bare-only vs
-> full tree) against the deployment path-mirror requirement in `docs/DEPLOYMENT.md`,
-> and record the finding here.
+Verified layout (pilot run, sgit-ai v0.15.0, 2026-08-16): the zip root contains
+`bare/**` (the encrypted store: data, refs, indexes, keys, branches, pending),
+`local/config.json` (mode metadata only in a read-only clone — the audit script fails
+the zip if anything key-shaped is inside it), and sgit's own `manifest.json`.
+Rename/copy the zip to `vaults/<slug>/vault.zip` and record the printed sha256.
+
+Run the audit script against the zip as well as the clone.
 
 ## Step 5 — Commit
 

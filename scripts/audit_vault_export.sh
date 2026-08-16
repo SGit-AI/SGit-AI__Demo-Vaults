@@ -33,21 +33,30 @@ fi
 
 echo "auditing: $TARGET"
 
-# 1+2: credential and scratch tiers must be absent
-for tier in ".sg_vault/local" ".sg_vault/work"; do
-  if find "$WORKDIR" -type d -path "*${tier}" | grep -q .; then
-    fail "credential/scratch tier present: $tier"
-  else
-    ok "no $tier"
-  fi
-done
-for f in vault_key token config.json; do
-  if find "$WORKDIR" -type f -name "$f" -path "*.sg_vault*" | grep -q .; then
+# 1+2: credential and scratch tiers must be absent.
+# Note both layouts: a clone has .sg_vault/local/; a `sgit vault backup` zip
+# has local/ at the ARCHIVE ROOT (verified on sgit-ai v0.15.0, 2026-08-16).
+if find "$WORKDIR" -type d -path "*.sg_vault/work" | grep -q .; then
+  fail "scratch tier present: .sg_vault/work"
+else
+  ok "no .sg_vault/work"
+fi
+for f in vault_key token VAULT-KEY; do
+  if find "$WORKDIR" -type f -name "$f" | grep -q .; then
     fail "credential file present: $f"
   else
-    ok "no .sg_vault/**/$f"
+    ok "no $f file"
   fi
 done
+# local/ config: allowed ONLY if it carries no key material (a read-only clone's
+# config holds just mode metadata; anything key-shaped fails).
+while IFS= read -r cfg; do
+  if grep -qiE '("passphrase"|"vault_key"|"token"|[0-9a-f]{64})' "$cfg"; then
+    fail "key material inside $(echo "$cfg" | sed "s|$WORKDIR/||")"
+  else
+    ok "no key material in $(echo "$cfg" | sed "s|$WORKDIR/||")"
+  fi
+done < <(find "$WORKDIR" -type f -path "*local/*")
 
 # 3: unwrapped key material
 if grep -rl "BEGIN PRIVATE KEY" "$WORKDIR" 2>/dev/null | grep -q .; then

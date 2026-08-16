@@ -40,8 +40,9 @@ backend:
 
 Steps per vault:
 
-1. Unzip `vaults/<slug>/vault.zip`.
-2. Place the `bare/` tree at `api/vault/read/<vault_id>/bare/` under the static root
+1. Unzip `vaults/<slug>/vault.zip` — `bare/` sits at the zip root (verified layout,
+   sgit-ai v0.15.0).
+2. Place that `bare/` tree at `api/vault/read/<vault_id>/bare/` under the static root
    (`vault_id` is in the manifest). Path-mirroring is the one hard requirement.
 3. Host page sets `window.SG_STATIC = true` and `window.SG_ENDPOINT = '<static base>'`,
    opens the vault with the read key, no access token → clean read-only
