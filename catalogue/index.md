@@ -10,6 +10,7 @@ verified deploy.
 | Slug | One line | Shape | Evidence | Copy/Ref | Write key | Vault ID | Endpoint | Read key | Last verified |
 |------|----------|-------|----------|----------|-----------|----------|----------|----------|---------------|
 | `demo-vaults-catalogue` | The catalogue itself: app + data + every published archive — a vault listing vaults, including itself | application | production | reference | escrowed | `2a8d3n2z` | https://send.sgraph.ai | `e6136dab44fecf12b440d6f827419fcb5d51e244576116336c5bef0c42adaa1a` | 2026-08-16 |
+| `riskmandate-black-hat-demo` | A risk register built live with visitors at a Black Hat stand — vault app, LLM chat, graph explorer, kanban board, two-session agent channel | application | demonstration | copy | escrowed | `4zf6pf2z` | https://send.sgraph.ai | `a702fba803faac4369eb5d5a320b4dfa017af62bd2425fb298aac4b99e95c0ae` | 2026-08-17 |
 | `sgit-deploy-docs` | The living deployment docs behind the deploy section of sgit.ai — seven targets, two AWS runbooks, reference pages | structured-analysis | production | reference | escrowed | `fyofmkvr` | https://send.sgraph.ai | `8d01421290efc3fa03205eced0534335a06ae209d627555b3dde136b878e3de1` | 2026-08-17 |
 | `field-notes-embed-demo` | The sgit.ai vault-app-embed demo: six small studies served as a vault app with a deliberately published read key | application | demonstration | copy | escrowed | `4bshby5n` | https://send.sgraph.ai | `2848993a68c02a33ea5582902c391901191e53680d35b36c0e76185d4107ad81` | 2026-08-16 |
 

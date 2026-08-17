@@ -1,0 +1,33 @@
+{
+  "slug": "riskmandate-black-hat-demo",
+  "title": "RiskMandate — the Black Hat register",
+  "one_line": "A risk register built live with visitors at a Black Hat stand: a vault app with an LLM chat, a fact-risk graph explorer, a kanban board rendered from markdown issues, and a two-session agent channel where the Claude inside the vault briefs the Claude building it.",
+  "shape": "application",
+  "evidence_status": "demonstration",
+  "copy_or_reference": "copy",
+  "write_key_status": "escrowed",
+  "vault_id": "4zf6pf2z",
+  "read_key": "a702fba803faac4369eb5d5a320b4dfa017af62bd2425fb298aac4b99e95c0ae",
+  "endpoints": ["https://send.sgraph.ai"],
+  "archive": "vault.zip",
+  "archive_sha256": "1b49d42e88af9ab5852c73a8ffdd3c668c6ffb94c013798a6a7326a6856a8bd8",
+  "exported_at": "2026-08-17",
+  "source": "read-only clone of 4zf6pf2z from send.sgraph.ai; archived with 'sgit vault backup' (sgit-ai v0.15.0, no --include-key)",
+  "secret_audit": {
+    "date": "2026-08-17",
+    "result": "clean",
+    "by": "claude — mechanical sweep + full-history decryption sweep (scripts/audit_vault_export.sh with the read key) + targeted review of config, field notes and guidance",
+    "openrouter_key": "SEALED — NOT readable with the published read key. The vault holds an OpenRouter credential at .vault/llm/config.json. The file itself decrypts with the read key, but the credential inside it does not: it is stored as keySealed {iv, ct} under keyTier 'owner', sealed via SGVaultOwnerSecrets.deriveKey(writeKeyHex), so only a write-key holder can unseal it. Verified four ways: (1) 16 candidate keys derived from the read key (raw, SHA-256, HKDF over 5 info strings, hex-ascii and bytes) all fail with InvalidTag; (2) the raw write key also fails, consistent with a further derivation step; (3) the design is code-verified in the Send repo's reality document (ui/index.md: 'an ro-token session (no write key) can neither use nor extract it'); (4) the read key is one-way derived from the vault key, so a read-key holder cannot compute the write key at all.",
+    "history_sweep": "All 1455 CAS objects across the vault's entire history decrypt with the read key and were scanned: zero credential-pattern hits. Exactly one sg-llm-config blob has ever existed and it has always been keyTier 'owner' with no plaintext key field — the vault was never in the 'shared' tier, where the provider key is stored in clear and IS extractable by any read-key holder.",
+    "pii": "No emails, no personal names, no company names. The vault's own field/guidance/briefing-protocol.md forbids them ('No names, no company names, no estate detail a visitor would recognise as theirs') and the three field notes follow it, describing visitors only as 'Visitor'."
+  },
+  "sgit_commits": 0,
+  "size_bytes": 40982307,
+  "has_app": true,
+  "working_tree_bytes": 2400000,
+  "cas_objects": 1455,
+  "releases": ["v0.15.5 4th (before risk refactor)", "v0.10.3 3rd MVP (with audio)", "v0.7.7 2nd MVP", "v0.3.3 First MVP"],
+  "last_verified": "2026-08-17",
+  "superseded_by": null,
+  "notes": "Snapshot of 2026-08-17; the endpoint serves the live vault. At 39 MB this is the first archive where the deliberate git+sgit duplication has a real cost: ~78 MB added across both stores versus a 2.3 MB working tree, because the weight is history (1455 objects, many 292 KB revisions of index.html). Kept in full at the project lead's decision, as the intended data point on duplication at scale."
+}

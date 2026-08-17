@@ -23,6 +23,23 @@
       "superseded_by": null
     },
     {
+      "slug": "riskmandate-black-hat-demo",
+      "title": "RiskMandate — the Black Hat register",
+      "one_line": "A risk register built live with visitors at a Black Hat stand: a vault app with an LLM chat, a fact-risk graph explorer, a kanban board rendered from markdown issues, and a two-session agent channel where the Claude inside the vault briefs the Claude building it.",
+      "shape": "application",
+      "evidence_status": "demonstration",
+      "copy_or_reference": "copy",
+      "write_key_status": "escrowed",
+      "vault_id": "4zf6pf2z",
+      "endpoint": "https://send.sgraph.ai",
+      "read_key": "a702fba803faac4369eb5d5a320b4dfa017af62bd2425fb298aac4b99e95c0ae",
+      "zip": "vaults/riskmandate-black-hat-demo/vault.zip",
+      "zip_sha256": "1b49d42e88af9ab5852c73a8ffdd3c668c6ffb94c013798a6a7326a6856a8bd8",
+      "exported_at": "2026-08-17",
+      "last_verified": "2026-08-17",
+      "superseded_by": null
+    },
+    {
       "slug": "sgit-deploy-docs",
       "title": "Deploy SG/Send",
       "one_line": "The living deployment-documentation vault behind the deploy section of sgit.ai: seven deployment targets, two AWS runbooks, a scripts index and three reference pages.",

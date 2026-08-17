@@ -2,8 +2,17 @@
 # Secret audit for a demo vault before publication.
 #
 # Usage:
-#   scripts/audit_vault_export.sh <vault-clone-dir>    # audit a local sgit clone
-#   scripts/audit_vault_export.sh <vault.zip>          # audit an exported archive
+#   scripts/audit_vault_export.sh <vault-clone-dir>              # audit a local sgit clone
+#   scripts/audit_vault_export.sh <vault.zip>                    # audit an exported archive
+#   scripts/audit_vault_export.sh <target> <read-key-hex>        # ALSO sweep full history
+#
+# With a read key, the audit decrypts EVERY object in bare/data and sweeps the
+# decrypted plaintext. That matters because an archive carries every past commit:
+# a credential removed from the working tree is still readable in history by anyone
+# holding the read key we are about to publish. It also flags any `shared`-tier LLM
+# config, where the provider key is stored in clear and is extractable by any opener
+# (the `owner` tier seals it under a write-key-derived key, which a read key cannot
+# reach). Verified against vault 4zf6pf2z, 2026-08-17.
 #
 # Publication is permanent (a published read key cannot be withdrawn), so every
 # check must pass BEFORE anything is committed to this repo. This is the mechanical
@@ -94,6 +103,48 @@ if [[ -n "$BARE" ]]; then
 else
   note "bare/ store" "NOT FOUND — wrong layout? verify export"
   FAIL=1
+fi
+
+# 6: full-history sweep — only possible with the read key, and it is the check that
+# catches a secret that was committed once and deleted later.
+READ_KEY="${2:-}"
+if [[ -n "$READ_KEY" ]]; then
+  BARE_DIR=$(find "$WORKDIR" -type d -name bare | head -1)
+  if [[ -n "$BARE_DIR" ]]; then
+    if WD="$BARE_DIR" RK="$READ_KEY" python3 - <<'PY'
+import os,glob,json,re,sys
+try:
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+except ImportError:
+    print("    (python 'cryptography' missing — history sweep skipped)"); sys.exit(0)
+a=AESGCM(bytes.fromhex(os.environ['RK']))
+pats=re.compile(rb"sk-or-v1-[A-Za-z0-9]{10,}|sk-[A-Za-z0-9]{24,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}"
+                rb"|ghp_[A-Za-z0-9]{20,}|github_pat_|xox[baprs]-|-----BEGIN [A-Z ]*PRIVATE KEY"
+                rb"|eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.")
+files=glob.glob(os.path.join(os.environ['WD'],'data','*'))
+ok=bad=0; hits=[]; shared=[]
+for f in files:
+    try: b=open(f,'rb').read(); pt=a.decrypt(b[:12],b[12:],None); ok+=1
+    except Exception: bad+=1; continue
+    for m in pats.finditer(pt): hits.append((os.path.basename(f), m.group()[:16].decode('utf-8','replace')))
+    if b'sg-llm-config' in pt or b'keyTier' in pt:
+        try: d=json.loads(pt)
+        except Exception: continue
+        if d.get('keyTier')!='owner' or 'key' in d or 'apiKey' in d:
+            shared.append((os.path.basename(f), d.get('keyTier')))
+print("    history: %d objects, %d decrypted with the read key, %d opaque"%(len(files),ok,bad))
+for f,s in hits[:10]: print("    HIT %s: %s…"%(f,s))
+for f,t in shared: print("    SHARED-TIER LLM CONFIG %s (keyTier=%r) — provider key readable by any read-key holder"%(f,t))
+sys.exit(1 if (hits or shared) else 0)
+PY
+    then ok "history sweep (all objects, all past commits)"
+    else fail "credentials or a shared-tier key found in history"
+    fi
+  else
+    note "history sweep" "SKIPPED — no bare/ found"
+  fi
+else
+  note "history sweep" "not run (pass the read key as arg 2)"
 fi
 
 [[ -n "$CLEANUP" ]] && rm -rf "$CLEANUP"
