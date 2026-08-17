@@ -161,8 +161,9 @@ jobs:
             z="demo-vault/vaults/$slug/vault.zip"
             echo "$sha  $z" | sha256sum -c -
             mkdir -p "$SITE/vaults/$slug"
-            cp "$z" "$SITE/vaults/$slug/vault.zip"
-            cp "$m" "$SITE/vaults/$slug/manifest.json"
+            # Everything in the entry's folder — the archive, the manifest, and any
+            # write-ups (videos.md and friends) that catalogue links point at.
+            cp -r "demo-vault/vaults/$slug/." "$SITE/vaults/$slug/"
             t=$(mktemp -d)
             unzip -q "$z" -d "$t"
             mkdir -p "$SITE/api/vault/read/$vid"

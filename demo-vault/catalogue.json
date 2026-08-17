@@ -38,7 +38,19 @@
       "links": [
         {
           "kind": "video",
-          "label": "Role risk map — the risk org chart (5 Aug)",
+          "label": "1 · Graph Browser (5 Aug)",
+          "url": "https://youtu.be/PP6zsrC0KEg",
+          "summary": "Questions become facts and the facts become an evidence graph with typed edges: where the agent runs, what data it reaches, whether it changes things on its own, how it is stopped and by whom, blast radius, reversibility, whose account it is. About a day's work to capture a whole estate's context."
+        },
+        {
+          "kind": "video",
+          "label": "2 · Risk Chains (5 Aug)",
+          "url": "https://youtu.be/kWip3QnuN1I",
+          "summary": "Risks connect element to element until they reach the corporate register, and navigate both ways — 'leads to' walks up, 'led by' walks down to the facts underneath, so a risk is justified rather than asserted. Includes the project lead rejecting a risk the tool generated and arguing the real exposure instead."
+        },
+        {
+          "kind": "video",
+          "label": "3 · Role risk map — the risk org chart (5 Aug)",
           "url": "https://youtu.be/yqQgff4RWuE",
           "summary": "Risks flow upward through the reporting structure to an accountable owner, arriving either by direct assignment or via the risk chain. No risk ends up orphaned, and once one lands on a named person they can challenge whether it belongs there."
         },

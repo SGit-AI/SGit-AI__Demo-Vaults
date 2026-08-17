@@ -10,15 +10,15 @@ on an accountable person**.
 
 | # | Video | What it adds |
 |---|---|---|
-| 1 | Graph Browser | Questions → facts → an evidence graph |
-| 2 | Risk Chains | Facts → risks that connect upward to the corporate register |
-| 3 | Role risk map | Risks → named owners, via the org chart |
+| 1 | [Graph Browser](https://youtu.be/PP6zsrC0KEg) | Questions → facts → an evidence graph |
+| 2 | [Risk Chains](https://youtu.be/kWip3QnuN1I) | Facts → risks that connect upward to the corporate register |
+| 3 | [Role risk map](https://youtu.be/yqQgff4RWuE) | Risks → named owners, via the org chart |
 
 ---
 
 ## 1 · Graph Browser (MVP, 5 Aug)
 
-**URL: _pending_**
+**https://youtu.be/PP6zsrC0KEg**
 
 The question set from the demo, rendered as a graph. It starts from one question — *do you
 have an agent, and where does it run?* — and if the answer is no, there is exactly one
@@ -58,7 +58,7 @@ it is assigned to, what causes it, and what it leads to.
 
 ## 2 · Risk Chains (MVP, 5 Aug)
 
-**URL: _pending_**
+**https://youtu.be/kWip3QnuN1I**
 
 The same estate seen as **connections between risks**, across the scenario set — typical,
 non-exposed, governed, exposed.

@@ -171,7 +171,12 @@
     var linkNotes = [];
     (e.links || []).forEach(function (l) {
       if (!l || !l.url) return;
-      acts.push('<a class="btn" href="' + esc(l.url) + '" target="_blank" rel="noopener">' +
+      // Relative links (a write-up shipped alongside the archive) resolve against the
+      // catalogue site, not against whatever host is displaying this app — inside SG/App
+      // or an embed the base is a different origin entirely, so a bare relative href
+      // would point at the wrong place or nowhere.
+      var href = /^[a-z]+:|^\/\//i.test(l.url) ? l.url : (site ? site + '/' + l.url.replace(/^\.?\//, '') : l.url);
+      acts.push('<a class="btn" href="' + esc(href) + '" target="_blank" rel="noopener">' +
         (ICON[l.kind] || '↗') + ' ' + esc(l.label || l.url) + '</a>');
       if (l.summary) linkNotes.push('<div class="linknote"><b>' +
         (ICON[l.kind] || '↗') + ' ' + esc(l.label || '') + '</b> — ' + esc(l.summary) + '</div>');
