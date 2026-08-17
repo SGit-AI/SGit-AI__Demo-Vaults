@@ -35,6 +35,14 @@
       "read_key": "a702fba803faac4369eb5d5a320b4dfa017af62bd2425fb298aac4b99e95c0ae",
       "zip": "vaults/riskmandate-black-hat-demo/vault.zip",
       "zip_sha256": "1b49d42e88af9ab5852c73a8ffdd3c668c6ffb94c013798a6a7326a6856a8bd8",
+      "links": [
+        {
+          "kind": "video",
+          "label": "Role risk map — the risk org chart (5 Aug)",
+          "url": "https://youtu.be/yqQgff4RWuE",
+          "summary": "Risks flow upward through the reporting structure to an accountable owner, arriving either by direct assignment or via the risk chain. No risk ends up orphaned, and once one lands on a named person they can challenge whether it belongs there."
+        }
+      ],
       "exported_at": "2026-08-17",
       "last_verified": "2026-08-17",
       "superseded_by": null

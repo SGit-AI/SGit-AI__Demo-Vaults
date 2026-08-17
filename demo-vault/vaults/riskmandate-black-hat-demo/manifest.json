@@ -27,6 +27,14 @@
   "working_tree_bytes": 2400000,
   "cas_objects": 1455,
   "releases": ["v0.15.5 4th (before risk refactor)", "v0.10.3 3rd MVP (with audio)", "v0.7.7 2nd MVP", "v0.3.3 First MVP"],
+  "links": [
+    {
+      "kind": "video",
+      "label": "Role risk map (risk org chart) — MVP walkthrough, 5 Aug",
+      "url": "https://youtu.be/yqQgff4RWuE",
+      "source": "title and URL supplied by the project lead; YouTube renders client-side so the page metadata could not be fetched to verify it independently"
+    }
+  ],
   "last_verified": "2026-08-17",
   "superseded_by": null,
   "notes": "Snapshot of 2026-08-17; the endpoint serves the live vault. At 39 MB this is the first archive where the deliberate git+sgit duplication has a real cost: ~78 MB added across both stores versus a 2.3 MB working tree, because the weight is history (1455 objects, many 292 KB revisions of index.html). Kept in full at the project lead's decision, as the intended data point on duplication at scale."

@@ -31,10 +31,20 @@ vaults/<slug>/
   "sgit_commits": 0,
   "size_bytes": 0,
   "has_app": true,
+  "links": [
+    { "kind": "video", "label": "MVP walkthrough", "url": "https://youtu.be/…" }
+  ],
   "last_verified": "2026-08-16",
   "superseded_by": null
 }
 ```
+
+`links` is optional: related material *outside* the vault — a walkthrough video, a
+write-up, a case-study page. `kind` is `video` · `write_up` · `page` (it only picks the
+icon; an unknown kind still renders). The catalogue app shows each one as an action
+button that opens in a new tab. Keep the label descriptive enough to be worth a click,
+and record in the manifest where the label came from if it was supplied rather than
+verified.
 
 Field meanings follow the catalogue column notes (`catalogue/index.md`). The example
 values above are from the live embed demo at sgit.ai/demos/vault-app-embed.html.

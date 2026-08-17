@@ -55,6 +55,10 @@
           border-radius:8px; padding:.5rem .7rem; overflow-x:auto; white-space:pre }
   .clone b{ color:var(--ink); font-weight:500 }
   .status{ margin-top:.5rem; font-size:.75rem; color:var(--dim); min-height:1em }
+  .linknote{ margin-top:.6rem; font-size:.79rem; color:var(--dim); line-height:1.55;
+             border-left:2px solid color-mix(in srgb, var(--teal) 45%, transparent);
+             padding-left:.7rem }
+  .linknote b{ color:var(--ink); font-weight:500 }
   .sha{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.64rem; color:var(--dim);
         margin-top:.55rem; overflow-wrap:anywhere }
   .frozen-note{ color:var(--warn); font-size:.78rem; margin-top:.55rem }
@@ -161,6 +165,18 @@
     if (e.zip && site) acts.push('<a class="btn" href="' + esc(site + '/' + e.zip) +
         '" target="_blank" rel="noopener" download>⭳ download vault.zip</a>');
 
+    // Related material — a walkthrough video, a write-up, a case study. External by
+    // nature: these open in a new tab, they are not part of the vault.
+    var ICON = { video: '▶', write_up: '✎', page: '↗' };
+    var linkNotes = [];
+    (e.links || []).forEach(function (l) {
+      if (!l || !l.url) return;
+      acts.push('<a class="btn" href="' + esc(l.url) + '" target="_blank" rel="noopener">' +
+        (ICON[l.kind] || '↗') + ' ' + esc(l.label || l.url) + '</a>');
+      if (l.summary) linkNotes.push('<div class="linknote"><b>' +
+        (ICON[l.kind] || '↗') + ' ' + esc(l.label || '') + '</b> — ' + esc(l.summary) + '</div>');
+    });
+
     card.innerHTML =
       '<h2>' + esc(e.title) + '</h2>' +
       '<p class="one">' + esc(e.one_line) + '</p>' +
@@ -171,6 +187,7 @@
         'read key : <b>' + esc(e.read_key) + '</b>' +
       '</div>' +
       '<div class="acts">' + acts.join('') + '</div>' +
+      linkNotes.join('') +
       '<div class="status"></div>' +
       '<div class="clone">clone it: <b>sgit clone ' + esc(cred(e)) + '</b></div>' +
       (e.zip_sha256 ? '<div class="sha">sha256 ' + esc(e.zip_sha256) + '</div>' : '') +
