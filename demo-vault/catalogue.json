@@ -41,6 +41,12 @@
           "label": "Role risk map — the risk org chart (5 Aug)",
           "url": "https://youtu.be/yqQgff4RWuE",
           "summary": "Risks flow upward through the reporting structure to an accountable owner, arriving either by direct assignment or via the risk chain. No risk ends up orphaned, and once one lands on a named person they can challenge whether it belongs there."
+        },
+        {
+          "kind": "write_up",
+          "label": "All three MVP walkthroughs, summarised",
+          "url": "vaults/riskmandate-black-hat-demo/videos.md",
+          "summary": "Graph browser, risk chains and role risk map as one pipeline: questions become facts, facts become risks that connect upward to the corporate register, and each risk lands on a named owner. Includes the project lead rejecting a risk the tool generated, and why that argument is the point."
         }
       ],
       "exported_at": "2026-08-17",

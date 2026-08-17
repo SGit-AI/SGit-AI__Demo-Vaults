@@ -1,12 +1,108 @@
 # Walkthrough videos — RiskMandate
 
-Recorded walkthroughs of this vault's app. Summaries are written from the project lead's
-narration, so they describe what the video actually demonstrates rather than what the
-feature was intended to do.
+Recorded walkthroughs of this vault's app, all MVP, 5 August. Summaries are written from
+the project lead's narration, so they describe what each video actually demonstrates
+rather than what the feature was intended to do.
+
+Read in this order, they are one pipeline: **the graph browser captures the facts**, **the
+risk chains connect the resulting risks upward**, and **the role risk map lands each risk
+on an accountable person**.
+
+| # | Video | What it adds |
+|---|---|---|
+| 1 | Graph Browser | Questions → facts → an evidence graph |
+| 2 | Risk Chains | Facts → risks that connect upward to the corporate register |
+| 3 | Role risk map | Risks → named owners, via the org chart |
 
 ---
 
-## Role risk map — the risk org chart (MVP, 5 Aug)
+## 1 · Graph Browser (MVP, 5 Aug)
+
+**URL: _pending_**
+
+The question set from the demo, rendered as a graph. It starts from one question — *do you
+have an agent, and where does it run?* — and if the answer is no, there is exactly one
+piece of information to hold. Everything after that is enrichment.
+
+**The graph is the evidence layer.** Each answer is a fact, and the graph is the record of
+facts and the decisions they inform. Edges are typed by relationship rather than uniform,
+so the graph carries *how* things relate, not merely that they do.
+
+The dimensions the walkthrough moves through:
+
+| Dimension | Values shown |
+|---|---|
+| Where it runs | operational vs test environment — the risk is similar either way; the question is whether it is live |
+| Data reached | personal data, accounts, contact details |
+| What it may do with data | cannot see it · reads it · reads **and changes** |
+| Change authority | read and report · change with a person's approval · changes on its own |
+| Stop control | an action to stop · eventually can stop · don't know how; and how long — minutes, an hour, don't know |
+| Stop *tested* | yes · only in test · never |
+| Effects of stopping | mapped · partial · unknown — **depends on** stop control, one level down the flow |
+| Stop authority | is there a named person |
+| Blast radius | internal only · customer-facing · don't know |
+| Outbound access | internet access vs no egress |
+| Reversibility | fully reversible · some changes are forever |
+| Written pull-the-plug procedure | tested · written · absent |
+| Reconstruct what it did | fully · partially · not — with the caveat that backups often cannot restore *specific* things |
+| Account ownership | service account · named person · team |
+
+A worked instance from the video: a production system touching personal data, accounts and
+contact details, informing decisions, reading **and changing** — "a typical agent".
+
+**Why it matters:** the whole context is capturable in about a day, and what comes out the
+other side is a roadmap of risks, the risk chains, and a register where each risk shows who
+it is assigned to, what causes it, and what it leads to.
+
+---
+
+## 2 · Risk Chains (MVP, 5 Aug)
+
+**URL: _pending_**
+
+The same estate seen as **connections between risks**, across the scenario set — typical,
+non-exposed, governed, exposed.
+
+**The chain, worked.** RISK-6, *"production can be changed by an agent"*, connects onward:
+the organisation acts through a system that acts for a person, which creates a further risk
+— *"organisation asks for tech to be changed"* — which arrives at the top, in the corporate
+risk register.
+
+**It navigates both ways, and that is the point.**
+
+| Direction | Question it answers |
+|---|---|
+| **leads to** | Where does this end up? Navigate upward toward the corporate register |
+| **led by** | Why does this exist? Navigate down to the facts underneath it |
+
+Clicking a corporate risk shows its justification directly: *corporate-2* is assigned to the
+CEO, reduced by particular choices, touches GDPR, and leads onward. Every risk should reach
+the top; a chain that doesn't is visible as such.
+
+As answers accumulate the register grows from nothing — no agent, no risk; *yes, there is an
+agent*, and risks appear and begin to interconnect.
+
+**The most valuable part of this video is the project lead disagreeing with the tool.** In
+the governed scenario it asserts a *loss of control* risk, and he rejects it: given the
+controls already recorded, he does not accept that risk as stated.
+
+Two things follow, and both are the argument for the product rather than against it:
+
+1. **This is what will happen when a risk is put forward for approval** — the stakeholder
+   will challenge it hard. The difference here is that the evidence for the claim is
+   attached to it, so the challenge is about the facts rather than about opinion.
+2. **His counter-analysis is more precise than the generated risk.** The real exposure is
+   that the agent touches the **EU AI Act**, putting the organisation in scope with an agent
+   in the mix. And although the estate can stop the agent within a minute, *stopping it is
+   itself disruptive to production* — an interruption that the register should capture in
+   its own right.
+
+The closing claim: this is now **fact-driven**, so a disagreement resolves against evidence
+instead of authority.
+
+---
+
+## 3 · Role risk map — the risk org chart (MVP, 5 Aug)
 
 **https://youtu.be/yqQgff4RWuE**
 
